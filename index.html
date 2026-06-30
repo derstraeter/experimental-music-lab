@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EXPERIMENTAL MUSIC LAB</title>
+  <script>p5.disableFriendlyErrors = true;</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Courier New', monospace;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      line-height: 1.2;
+    }
+    
+    #container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      grid-template-rows: 60px 1fr 200px;
+      height: 100vh;
+      gap: 2px;
+      background: #fff;
+    }
+    
+    #header {
+      grid-column: 1 / -1;
+      background: #000;
+      border-bottom: 4px solid #fff;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    #header h1 {
+      font-size: 24px;
+      letter-spacing: 4px;
+      font-weight: 900;
+    }
+    
+    #controls {
+      background: #000;
+      border-right: 4px solid #fff;
+      padding: 20px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    
+    #canvas-container {
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #sequencer {
+      grid-column: 1 / -1;
+      background: #000;
+      border-top: 4px solid #fff;
+      padding: 15px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+      border: 2px solid #fff;
+      padding: 10px;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 900;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+      background: #fff;
+      color: #000;
+      padding: 4px 8px;
+      display: inline-block;
+    }
+    
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      margin: 4px 4px 4px 0;
+      letter-spacing: 1px;
+      transition: all 0.1s;
+    }
+    
+    button:hover {
+      background: #ff0;
+      transform: translate(-2px, -2px);
+      box-shadow: 2px 2px 0 #fff;
+    }
+    
+    button:active {
+      transform: translate(0, 0);
+      box-shadow: none;
+    }
+    
+    button.active {
+      background: #ff0;
+      color: #000;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      margin: 8px 0;
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    
+    input[type="range"]::-webkit-slider-track {
+      background: #fff;
+      height: 4px;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #ff0;
+      border: 2px solid #fff;
+      cursor: pointer;
+    }
+    
+    input[type="range"]::-moz-range-track {
+      background: #fff;
+      height: 4px;
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #ff0;
+      border: 2px solid #fff;
+      cursor: pointer;
+    }
+    
+    label {
+      display: block;
+      font-size: 11px;
+      margin-top: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    
+    .param-value {
+      color: #ff0;
+      float: right;
+    }
+    
+    #step-grid {
+      display: grid;
+      grid-template-columns: repeat(16, 40px);
+      gap: 4px;
+      margin-top: 10px;
+    }
+    
+    .step {
+      width: 40px;
+      height: 40px;
+      background: #111;
+      border: 2px solid #333;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+    
+    .step:hover {
+      border-color: #ff0;
+    }
+    
+    .step.active {
+      background: #ff0;
+      border-color: #fff;
+    }
+    
+    .step.playing {
+      border-color: #f00;
+      border-width: 4px;
+    }
+    
+    #youtube-input {
+      width: 100%;
+      background: #000;
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      margin-top: 8px;
+    }
+    
+    #youtube-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 640px;
+      height: 360px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 1;
+      border: 2px solid #fff;
+    }
+    
+    #youtube-container.visible {
+      pointer-events: auto;
+    }
+    
+    canvas {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      z-index: 2;
+      pointer-events: none;
+    }
+    
+    .synth-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    
+    #file-input {
+      display: none;
+    }
+    
+    .sample-list {
+      margin-top: 10px;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    
+    .sample-item {
+      padding: 4px;
+      border: 1px solid #333;
+      margin-bottom: 2px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    
+    .sample-item:hover {
+      background: #222;
+      border-color: #ff0;
+    }
+    
+    .sample-item.selected {
+      background: #333;
+      border-color: #ff0;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="header">
+      <h1>EXPERIMENTAL MUSIC LAB</h1>
+      <button id="master-play">► PLAY</button>
+    </div>
+    
+    <div id="controls">
+      <div class="section">
+        <div class="section-title">SYNTHESIZERS</div>
+        <div class="synth-row">
+          <button class="synth-btn active" data-synth="0">SINE</button>
+          <button class="synth-btn" data-synth="1">SQUARE</button>
+          <button class="synth-btn" data-synth="2">SAW</button>
+          <button class="synth-btn" data-synth="3">TRIANGLE</button>
+        </div>
+        <div class="synth-row">
+          <button class="synth-btn" data-synth="4">NOISE</button>
+          <button class="synth-btn" data-synth="5">FM</button>
+          <button class="synth-btn" data-synth="6">AM</button>
+          <button class="synth-btn" data-synth="7">SAMPLE</button>
+        </div>
+        
+        <label>FREQUENCY <span class="param-value" id="freq-val">440</span></label>
+        <input type="range" id="freq" min="20" max="2000" value="440" step="1">
+        
+        <label>DETUNE <span class="param-value" id="detune-val">0</span></label>
+        <input type="range" id="detune" min="-100" max="100" value="0" step="1">
+        
+        <label>ATTACK <span class="param-value" id="attack-val">0.01</span></label>
+        <input type="range" id="attack" min="0.001" max="2" value="0.01" step="0.001">
+        
+        <label>RELEASE <span class="param-value" id="release-val">0.5</span></label>
+        <input type="range" id="release" min="0.01" max="5" value="0.5" step="0.01">
+        
+        <label>FILTER FREQ <span class="param-value" id="filter-freq-val">1000</span></label>
+        <input type="range" id="filter-freq" min="20" max="20000" value="1000" step="10">
+        
+        <label>RESONANCE <span class="param-value" id="resonance-val">1</span></label>
+        <input type="range" id="resonance" min="0.1" max="30" value="1" step="0.1">
+      </div>
+      
+      <div class="section">
+        <div class="section-title">SAMPLER</div>
+        <button id="load-sample">LOAD SAMPLE</button>
+        <input type="file" id="file-input" accept="audio/*">
+        <div class="sample-list" id="sample-list"></div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">VISUALIZATION</div>
+        <button class="viz-btn active" data-viz="0">WAVEFORM</button>
+        <button class="viz-btn" data-viz="1">SPECTRUM</button>
+        <button class="viz-btn" data-viz="2">PARTICLES</button>
+        <button class="viz-btn" data-viz="3">RADIAL</button>
+        <button class="viz-btn" data-viz="4">GRID</button>
+        <button class="viz-btn" data-viz="5">FLOW</button>
+        <button class="viz-btn" data-viz="6">GLITCH</button>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">YOUTUBE</div>
+        <button id="toggle-youtube">SHOW/HIDE</button>
+        <input type="text" id="youtube-input" placeholder="PASTE YOUTUBE URL">
+        <button id="load-youtube">LOAD VIDEO</button>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">SEQUENCER</div>
+        <label>BPM <span class="param-value" id="bpm-val">120</span></label>
+        <input type="range" id="bpm" min="40" max="300" value="120" step="1">
+        <button id="seq-play">► SEQ PLAY</button>
+        <button id="seq-stop">■ STOP</button>
+        <button id="seq-clear">CLEAR</button>
+      </div>
+    </div>
+    
+    <div id="canvas-container">
+      <div id="youtube-container"></div>
+    </div>
+    
+    <div id="sequencer">
+      <div id="step-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    // === AUDIO ENGINE ===
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+    let masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.3;
+    masterGain.connect(audioCtx.destination);
+    
+    let analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.connect(masterGain);
+    
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+    const timeDomainData = new Uint8Array(analyser.bufferLength);
+    
+    let currentSynth = 0;
+    let params = {
+      freq: 440,
+      detune: 0,
+      attack: 0.01,
+      release: 0.5,
+      filterFreq: 1000,
+      resonance: 1
+    };
+    
+    let samples = [];
+    let currentSample = null;
+    
+    // Sequencer
+    const STEPS = 16;
+    let sequence = new Array(STEPS).fill(false);
+    let currentStep = 0;
+    let isPlaying = false;
+    let sequencerInterval = null;
+    let bpm = 120;
+    
+    // === SYNTHESIZER FUNCTIONS ===
+    function createOscillator(type, freq, detune) {
+      const osc = audioCtx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = freq;
+      osc.detune.value = detune;
+      return osc;
+    }
+    
+    function createNoiseBuffer() {
+      const bufferSize = audioCtx.sampleRate * 2;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+      return buffer;
+    }
+    
+    function playSound() {
+      audioCtx.resume();
+      
+      const now = audioCtx.currentTime;
+      const gainNode = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = params.filterFreq;
+      filter.Q.value = params.resonance;
+      
+      gainNode.gain.setValueAtTime(0, now);
+      gainNode.gain.linearRampToValueAtTime(0.3, now + params.attack);
+      gainNode.gain.linearRampToValueAtTime(0, now + params.attack + params.release);
+      
+      let source;
+      
+      switch(currentSynth) {
+        case 0: // SINE
+          source = createOscillator('sine', params.freq, params.detune);
+          break;
+        case 1: // SQUARE
+          source = createOscillator('square', params.freq, params.detune);
+          break;
+        case 2: // SAW
+          source = createOscillator('sawtooth', params.freq, params.detune);
+          break;
+        case 3: // TRIANGLE
+          source = createOscillator('triangle', params.freq, params.detune);
+          break;
+        case 4: // NOISE
+          source = audioCtx.createBufferSource();
+          source.buffer = createNoiseBuffer();
+          source.loop = false;
+          break;
+        case 5: // FM
+          const carrier = createOscillator('sine', params.freq, params.detune);
+          const modulator = createOscillator('sine', params.freq * 2, 0);
+          const modGain = audioCtx.createGain();
+          modGain.gain.value = 100;
+          modulator.connect(modGain);
+          modGain.connect(carrier.frequency);
+          modulator.start(now);
+          modulator.stop(now + params.attack + params.release);
+          source = carrier;
+          break;
+        case 6: // AM
+          const osc1 = createOscillator('sine', params.freq, params.detune);
+          const osc2 = createOscillator('sine', 10, 0);
+          const amGain = audioCtx.createGain();
+          amGain.gain.value = 0;
+          osc2.connect(amGain.gain);
+          osc1.connect(amGain);
+          osc2.start(now);
+          osc2.stop(now + params.attack + params.release);
+          amGain.connect(filter);
+          filter.connect(gainNode);
+          gainNode.connect(analyser);
+          osc1.start(now);
+          osc1.stop(now + params.attack + params.release);
+          return;
+        case 7: // SAMPLE
+          if (currentSample) {
+            source = audioCtx.createBufferSource();
+            source.buffer = currentSample;
+            source.playbackRate.value = params.freq / 440;
+          } else {
+            source = createOscillator('sine', params.freq, params.detune);
+          }
+          break;
+      }
+      
+      source.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(analyser);
+      
+      source.start(now);
+      source.stop(now + params.attack + params.release);
+    }
+    
+    // === SAMPLE LOADER ===
+    document.getElementById('load-sample').addEventListener('click', () => {
+      document.getElementById('file-input').click();
+    });
+    
+    document.getElementById('file-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+        samples.push({ name: file.name, buffer: audioBuffer });
+        updateSampleList();
+      }
+    });
+    
+    function updateSampleList() {
+      const list = document.getElementById('sample-list');
+      list.innerHTML = '';
+      samples.forEach((sample, idx) => {
+        const div = document.createElement('div');
+        div.className = 'sample-item';
+        div.textContent = sample.name;
+        div.addEventListener('click', () => {
+          currentSample = sample.buffer;
+          document.querySelectorAll('.sample-item').forEach(el => el.classList.remove('selected'));
+          div.classList.add('selected');
+          document.querySelector('[data-synth="7"]').click();
+        });
+        list.appendChild(div);
+      });
+    }
+    
+    // === SEQUENCER ===
+    function initSequencer() {
+      const grid = document.getElementById('step-grid');
+      for (let i = 0; i < STEPS; i++) {
+        const step = document.createElement('div');
+        step.className = 'step';
+        step.dataset.step = i;
+        step.addEventListener('click', () => {
+          sequence[i] = !sequence[i];
+          step.classList.toggle('active');
+        });
+        grid.appendChild(step);
+      }
+    }
+    
+    function stepSequencer() {
+      const steps = document.querySelectorAll('.step');
+      steps.forEach(s => s.classList.remove('playing'));
+      
+      if (sequence[currentStep]) {
+        playSound();
+      }
+      
+      steps[currentStep].classList.add('playing');
+      currentStep = (currentStep + 1) % STEPS;
+    }
+    
+    document.getElementById('seq-play').addEventListener('click', () => {
+      if (!isPlaying) {
+        isPlaying = true;
+        const interval = (60 / bpm) * 1000 / 4;
+        sequencerInterval = setInterval(stepSequencer, interval);
+      }
+    });
+    
+    document.getElementById('seq-stop').addEventListener('click', () => {
+      isPlaying = false;
+      clearInterval(sequencerInterval);
+      currentStep = 0;
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('playing'));
+    });
+    
+    document.getElementById('seq-clear').addEventListener('click', () => {
+      sequence.fill(false);
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    });
+    
+    document.getElementById('bpm').addEventListener('input', (e) => {
+      bpm = parseInt(e.target.value);
+      document.getElementById('bpm-val').textContent = bpm;
+      if (isPlaying) {
+        clearInterval(sequencerInterval);
+        const interval = (60 / bpm) * 1000 / 4;
+        sequencerInterval = setInterval(stepSequencer, interval);
+      }
+    });
+    
+    // === UI CONTROLS ===
+    document.querySelectorAll('.synth-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.synth-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSynth = parseInt(btn.dataset.synth);
+      });
+    });
+    
+    document.getElementById('master-play').addEventListener('click', playSound);
+    
+    ['freq', 'detune', 'attack', 'release', 'filter-freq', 'resonance'].forEach(param => {
+      const slider = document.getElementById(param);
+      const display = document.getElementById(param + '-val');
+      slider.addEventListener('input', (e) => {
+        const key = param.replace('-', '').replace('freq', 'freq').replace('filterfreq', 'filterFreq');
+        params[key === 'freq' ? 'freq' : key === 'filterfreq' ? 'filterFreq' : key] = parseFloat(e.target.value);
+        display.textContent = parseFloat(e.target.value).toFixed(key === 'freq' || key === 'filterFreq' ? 0 : 3);
+      });
+    });
+    
+    // === YOUTUBE INTEGRATION ===
+    let ytPlayer = null;
+    let ytVisible = false;
+    
+    document.getElementById('toggle-youtube').addEventListener('click', () => {
+      ytVisible = !ytVisible;
+      document.getElementById('youtube-container').classList.toggle('visible');
+    });
+    
+    document.getElementById('load-youtube').addEventListener('click', () => {
+      const url = document.getElementById('youtube-input').value;
+      const videoId = extractVideoId(url);
+      if (videoId) {
+        loadYouTubeVideo(videoId);
+      }
+    });
+    
+    function extractVideoId(url) {
+      const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+      return match ? match[1] : null;
+    }
+    
+    function loadYouTubeVideo(videoId) {
+      const container = document.getElementById('youtube-container');
+      container.innerHTML = `<iframe width="640" height="360" 
+        src="https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1" 
+        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    }
+    
+    // === P5.JS VISUALIZATION ===
+    let currentViz = 0;
+    let particles = [];
+    const NUM_PARTICLES = 100;
+    
+    document.querySelectorAll('.viz-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.viz-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentViz = parseInt(btn.dataset.viz);
+        particles = [];
+        for (let i = 0; i < NUM_PARTICLES; i++) {
+          particles.push(new Particle());
+        }
+      });
+    });
+    
+    const sketch = (p) => {
+      p.setup = function() {
+        const container = document.getElementById('canvas-container');
+        const canvas = p.createCanvas(container.clientWidth, container.clientHeight);
+        canvas.parent('canvas-container');
+        p.colorMode(p.HSB, 360, 100, 100, 100);
+        
+        for (let i = 0; i < NUM_PARTICLES; i++) {
+          particles.push(new Particle());
+        }
+      };
+      
+      p.draw = function() {
+        analyser.getByteFrequencyData(frequencyData);
+        analyser.getByteTimeDomainData(timeDomainData);
+        
+        // Calculate average amplitude
+        let sum = 0;
+        for (let i = 0; i < frequencyData.length; i++) {
+          sum += frequencyData[i];
+        }
+        const avg = sum / frequencyData.length;
+        
+        p.background(0, 0, 0, 20);
+        
+        switch(currentViz) {
+          case 0: drawWaveform(p); break;
+          case 1: drawSpectrum(p); break;
+          case 2: drawParticles(p, avg); break;
+          case 3: drawRadial(p); break;
+          case 4: drawGrid(p, avg); break;
+          case 5: drawFlow(p, avg); break;
+          case 6: drawGlitch(p, avg); break;
+        }
+      };
+      
+      function drawWaveform(p) {
+        p.stroke(60, 100, 100);
+        p.strokeWeight(2);
+        p.noFill();
+        p.beginShape();
+        for (let i = 0; i < timeDomainData.length; i++) {
+          const x = p.map(i, 0, timeDomainData.length, 0, p.width);
+          const y = p.map(timeDomainData[i], 0, 255, p.height, 0);
+          p.vertex(x, y);
+        }
+        p.endShape();
+      }
+      
+      function drawSpectrum(p) {
+        const barWidth = p.width / frequencyData.length * 4;
+        for (let i = 0; i < frequencyData.length / 4; i++) {
+          const h = p.map(i, 0, frequencyData.length / 4, 0, 360);
+          const barHeight = p.map(frequencyData[i], 0, 255, 0, p.height);
+          p.fill(h, 100, 100);
+          p.noStroke();
+          p.rect(i * barWidth, p.height - barHeight, barWidth - 2, barHeight);
+        }
+      }
+      
+      function drawParticles(p, avg) {
+        particles.forEach(particle => {
+          particle.update(avg);
+          particle.display(p);
+        });
+      }
+      
+      function drawRadial(p) {
+        p.translate(p.width / 2, p.height / 2);
+        p.rotate(p.frameCount * 0.01);
+        for (let i = 0; i < frequencyData.length / 8; i++) {
+          const angle = p.map(i, 0, frequencyData.length / 8, 0, p.TWO_PI);
+          const radius = p.map(frequencyData[i], 0, 255, 50, 300);
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+          const h = p.map(i, 0, frequencyData.length / 8, 0, 360);
+          p.stroke(h, 100, 100);
+          p.strokeWeight(3);
+          p.line(0, 0, x, y);
+        }
+      }
+      
+      function drawGrid(p, avg) {
+        const cols = 20;
+        const rows = 15;
+        const cellW = p.width / cols;
+        const cellH = p.height / rows;
+        
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            const idx = Math.floor((i + j * cols) % (frequencyData.length / 2));
+            const brightness = p.map(frequencyData[idx], 0, 255, 0, 100);
+            p.fill(60, 100, brightness);
+            p.stroke(0, 0, 100);
+            p.strokeWeight(1);
+            p.rect(i * cellW, j * cellH, cellW - 2, cellH - 2);
+          }
+        }
+      }
+      
+      function drawFlow(p, avg) {
+        const step = 30;
+        const scale = 0.005;
+        const time = p.frameCount * 0.01;
+        
+        for (let x = 0; x < p.width; x += step) {
+          for (let y = 0; y < p.height; y += step) {
+            const angle = p.noise(x * scale, y * scale, time) * p.TWO_PI * 2;
+            const length = p.map(avg, 0, 128, 5, 25);
+            const x2 = x + Math.cos(angle) * length;
+            const y2 = y + Math.sin(angle) * length;
+            const h = p.map(p.noise(x * scale * 2, y * scale * 2), 0, 1, 0, 360);
+            p.stroke(h, 100, 80);
+            p.strokeWeight(2);
+            p.line(x, y, x2, y2);
+          }
+        }
+      }
+      
+      function drawGlitch(p, avg) {
+        if (avg > 20) {
+          const sliceHeight = 20;
+          for (let y = 0; y < p.height; y += sliceHeight) {
+            const offset = p.random(-avg, avg);
+            p.copy(p.canvas, 0, y, p.width, sliceHeight, offset, y, p.width, sliceHeight);
+          }
+          
+          if (p.random(1) > 0.7) {
+            p.fill(60, 100, 100, 30);
+            p.noStroke();
+            p.rect(p.random(p.width), p.random(p.height), p.random(50, 200), p.random(10, 50));
+          }
+        }
+      }
+      
+      p.windowResized = function() {
+        const container = document.getElementById('canvas-container');
+        p.resizeCanvas(container.clientWidth, container.clientHeight);
+      };
+      
+      class Particle {
+        constructor() {
+          this.x = p.random(p.width);
+          this.y = p.random(p.height);
+          this.vx = p.random(-2, 2);
+          this.vy = p.random(-2, 2);
+          this.hue = p.random(360);
+          this.size = p.random(2, 8);
+        }
+        
+        update(force) {
+          const acceleration = p.map(force, 0, 128, 0, 2);
+          this.vx += p.random(-acceleration, acceleration);
+          this.vy += p.random(-acceleration, acceleration);
+          
+          this.vx = p.constrain(this.vx, -5, 5);
+          this.vy = p.constrain(this.vy, -5, 5);
+          
+          this.x += this.vx;
+          this.y += this.vy;
+          
+          if (this.x < 0 || this.x > p.width) this.vx *= -1;
+          if (this.y < 0 || this.y > p.height) this.vy *= -1;
+          
+          this.x = p.constrain(this.x, 0, p.width);
+          this.y = p.constrain(this.y, 0, p.height);
+        }
+        
+        display(p) {
+          p.noStroke();
+          p.fill(this.hue, 100, 100, 80);
+          p.ellipse(this.x, this.y, this.size);
+        }
+      }
+    };
+    
+    new p5(sketch);
+    
+    // Initialize
+    initSequencer();
+    audioCtx.resume();
+  </script>
+</body>
+</html>
