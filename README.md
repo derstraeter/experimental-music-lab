@@ -1,153 +1,147 @@
-EXPERIMENTAL MUSIC LAB - USER GUIDE
-====================================
+# EXPERIMENTAL MUSIC LAB
 
-Created: experimental-music-lab.html
-A brutalist experimental music making website with real-time audio-reactive visualization.
+A brutalist experimental music-making website with real-time audio-reactive visualization.
 
-CORE FEATURES:
--------------
+## 🎵 [LIVE DEMO](https://derstraeter.github.io/experimental-music-lab/)
 
-1. SYNTHESIZERS (8 types):
-   - SINE: Pure sine wave
-   - SQUARE: Square wave (harsh, retro)
-   - SAW: Sawtooth wave (bright, aggressive)
-   - TRIANGLE: Triangle wave (mellow)
-   - NOISE: White noise generator
-   - FM: Frequency modulation synthesis
-   - AM: Amplitude modulation synthesis
-   - SAMPLE: Play loaded audio samples
+![Experimental Music Lab Interface](https://img.shields.io/badge/status-experimental-yellow) ![License](https://img.shields.io/badge/license-MIT-blue)
 
-2. SYNTHESIS CONTROLS:
-   - FREQUENCY: 20-2000 Hz (pitch control)
-   - DETUNE: -100 to +100 cents (microtuning)
-   - ATTACK: 0.001-2 seconds (sound fade-in)
-   - RELEASE: 0.01-5 seconds (sound fade-out)
-   - FILTER FREQ: 20-20000 Hz (lowpass filter cutoff)
-   - RESONANCE: 0.1-30 (filter resonance/Q)
+## Overview
 
-3. STEP SEQUENCER:
-   - 16-step grid at the bottom
-   - Click any step to toggle it on/off (yellow = active)
-   - SEQ PLAY: Start sequence playback
-   - STOP: Stop playback
-   - CLEAR: Clear all active steps
-   - BPM: 40-300 (tempo control)
-   - Red border shows current playing step
+An experimental web-based music creation tool that combines synthesis, sequencing, sampling, and real-time visualization in a brutalist interface. Built with Web Audio API and p5.js.
 
-4. SAMPLER:
-   - LOAD SAMPLE: Import your own audio files
-   - Samples appear in the list below
-   - Click a sample to select it
-   - Switch to SAMPLE synth to play it
-   - Pitch follows FREQUENCY control
+## Features
 
-5. VISUALIZATIONS (7 modes):
-   - WAVEFORM: Classic oscilloscope view
-   - SPECTRUM: Frequency spectrum bars
-   - PARTICLES: Audio-reactive particle system
-   - RADIAL: Rotating radial frequency display
-   - GRID: Grid of cells responding to frequency
-   - FLOW: Perlin noise flow field driven by audio
-   - GLITCH: Glitch effect triggered by audio amplitude
+### 🎹 8 Synthesizer Types
+- **SINE** - Pure sine wave
+- **SQUARE** - Square wave (harsh, retro)
+- **SAW** - Sawtooth wave (bright, aggressive)
+- **TRIANGLE** - Triangle wave (mellow)
+- **NOISE** - White noise generator
+- **FM** - Frequency modulation synthesis
+- **AM** - Amplitude modulation synthesis
+- **SAMPLE** - Play imported audio files
 
-6. YOUTUBE INTEGRATION:
-   - Paste any YouTube URL
-   - Click LOAD VIDEO
-   - Toggle SHOW/HIDE to overlay video
-   - Visualization renders on top at 30% opacity
-   - Make music to your favorite videos
+### 🎛️ Synthesis Controls
+- **FREQUENCY**: 20-2000 Hz pitch control
+- **DETUNE**: -100 to +100 cents microtuning
+- **ATTACK**: 0.001-2 seconds fade-in
+- **RELEASE**: 0.01-5 seconds fade-out
+- **FILTER FREQ**: 20-20000 Hz lowpass cutoff
+- **RESONANCE**: 0.1-30 filter Q
 
-WORKFLOW:
----------
+### 🎼 16-Step Sequencer
+- Click steps to toggle patterns
+- BPM control: 40-300
+- Real-time playback
+- Visual step indicator
 
-IMMEDIATE PLAYBACK:
-1. Select a synth type (SINE, SQUARE, etc.)
-2. Click ► PLAY to trigger a sound
-3. Adjust FREQUENCY, FILTER, ATTACK, RELEASE
-4. Try different synths and parameters
+### 🎨 7 Audio-Reactive Visualizations
+- **WAVEFORM** - Oscilloscope view
+- **SPECTRUM** - Frequency bars
+- **PARTICLES** - Audio-driven particle system
+- **RADIAL** - Rotating frequency display
+- **GRID** - Audio-reactive cell grid
+- **FLOW** - Perlin noise flow field
+- **GLITCH** - Amplitude-triggered effects
 
-SEQUENCED PATTERNS:
-1. Select your synth
-2. Click steps in the sequencer grid
-3. Adjust BPM
-4. Click ► SEQ PLAY
-5. Pattern loops automatically
+### 📹 YouTube Integration
+- Paste any YouTube URL
+- Video plays underneath visualization
+- Create music over your favorite videos
+- Toggle show/hide overlay
 
-SAMPLE PLAYBACK:
-1. Click LOAD SAMPLE
+### 💾 Sample Import
+- Load your own audio files
+- Pitch-shift samples with frequency control
+- Play samples through any synth engine
+
+## Design Philosophy
+
+### Brutalist Approach
+- **Stark black & white** interface with yellow accents
+- **Courier New** monospace typography
+- **4px white borders** creating aggressive grid separation
+- **No gradients, no decoration** - pure function
+- **Tool-first layout** optimized for making sound
+
+This is an **Operate** surface - designed for active manipulation, not passive viewing. Controls and real-time feedback dominate.
+
+## Quick Start
+
+### Immediate Playback
+1. Select a synth type (SINE is default)
+2. Click **► PLAY**
+3. Adjust parameters
+4. Switch visualizations
+
+### Pattern Sequencing
+1. Click steps in the 16-step grid
+2. Set BPM
+3. Click **► SEQ PLAY**
+4. Pattern loops automatically
+
+### Sample Playback
+1. Click **LOAD SAMPLE**
 2. Select an audio file (.wav, .mp3, etc.)
-3. Sample appears in list
-4. Click sample name to select it
-5. Click ► PLAY to trigger
+3. Click sample name to select
+4. Click **► PLAY** to trigger
 
-VISUAL EXPLORATION:
-1. Make sound with any method above
-2. Switch between visualization modes
-3. Each mode responds differently to audio
-4. Combine with YouTube for multimedia
+## Technical Details
 
-BRUTALIST DESIGN FEATURES:
---------------------------
-- Black & white high-contrast interface
-- Monospace typography (Courier New)
-- 4px white borders separating sections
-- Yellow (#ff0) accent color for active states
-- No gradients, no decorative elements
-- Functional, tool-first layout
-- Hover effects: shadow displacement
-- Grid-based composition
+- **Audio Engine**: Web Audio API
+- **Visualization**: p5.js
+- **Single HTML file** - fully self-contained
+- **No build step** required
+- **Works offline** once loaded
+- **Responsive** canvas sizing
 
-TECHNICAL DETAILS:
------------------
-- Built with Web Audio API (synthesis & analysis)
-- p5.js for real-time visualization
-- Single self-contained HTML file
-- Works offline once loaded
-- No build step required
-- Responsive canvas sizing
+## Browser Compatibility
 
-KEYBOARD SHORTCUTS:
-------------------
-(None implemented - use mouse/touch)
+- ✅ Chrome/Edge - Full support
+- ✅ Firefox - Full support
+- ✅ Safari - Full support (may require user interaction to start audio)
 
-BROWSER COMPATIBILITY:
----------------------
-- Chrome/Edge: Full support
-- Firefox: Full support
-- Safari: Full support (may require user interaction to start audio)
+## Experimental Techniques
 
-TIPS:
------
-- Start with low FILTER FREQ and high RESONANCE for classic synth sounds
-- Use short ATTACK + RELEASE for percussive sounds
-- Combine FM/AM synths with filter modulation for complex timbres
-- NOISE + low FILTER FREQ = bass drum
-- SQUARE + high RESONANCE = acid bass
-- Load vocal samples and pitch them with FREQUENCY
-- Use GLITCH visualization with heavy audio for intense effects
-- YouTube overlay works best with music videos or abstract content
-
-EXPERIMENTAL TECHNIQUES:
------------------------
 1. Create rhythmic patterns in sequencer
-2. Load multiple samples
-3. Switch samples mid-sequence for variation
-4. Use extreme RESONANCE values (20-30) for self-oscillation
-5. Rapidly switch between synth types while sequencer plays
-6. Layer YouTube video under visualization
-7. Use FLOW or PARTICLES viz with slow, evolving sounds
+2. Load multiple samples and switch mid-sequence
+3. Use extreme RESONANCE (20-30) for self-oscillation
+4. Rapidly switch synth types while sequencer plays
+5. Layer YouTube video under visualization
+6. Combine FLOW or PARTICLES with slow, evolving sounds
 
-NEXT STEPS / EXTENSIONS:
------------------------
-- Add keyboard shortcuts (e.g., QWERTY keys trigger notes)
+## Tips
+
+- Start with low **FILTER FREQ** and high **RESONANCE** for classic synth sounds
+- Use short **ATTACK** + **RELEASE** for percussive sounds
+- **NOISE** + low **FILTER FREQ** = bass drum
+- **SQUARE** + high **RESONANCE** = acid bass
+- Load vocal samples and pitch them with **FREQUENCY**
+
+## Future Extensions
+
+- Keyboard shortcuts (QWERTY triggers notes)
 - MIDI controller support
 - Record output to WAV
 - Save/load patterns
-- Multiple tracks in sequencer
+- Multiple sequencer tracks
 - Effects (reverb, delay, distortion)
 - LFO modulation
 - More synthesis types (wavetable, granular, physical modeling)
 - Preset system
 - Fullscreen mode
 
-Enjoy experimenting!
+## License
+
+MIT - Do whatever you want with it
+
+## Credits
+
+Built with:
+- [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
+- [p5.js](https://p5js.org/)
+
+---
+
+**Enjoy experimenting!** 🎵🎨
